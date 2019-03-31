@@ -1,0 +1,143 @@
+A为基类，B1,B2分别继承A，C继承B1和B2
+
+没有使用虚基类继承：
+1 在C的构造函数中不用初始化基类A
+2 在C的构造函数中初始化列表B1，B2，则两者分别调用A的构造函数。
+结果如下：
+initial A
+initial B1
+initial A
+initial B2
+initial C
+in b1A:2
+in b2A:3
+
+#include<iostream>
+using namespace std;
+
+class A{
+private:
+		int cv1;
+
+public:
+	void outa(){
+		cout<<"A:"<<cv1<<endl;
+	}
+	A(int a):cv1(a){
+	cout<<"initial A"<<endl;
+	}
+};
+
+class B1:public A{
+private:
+	int cvb1;
+public:
+	void outb1(){
+		cout<<"in b1";
+		outa();
+	}
+	B1(int a):A(a){
+		cout<<"initial B1"<<endl;
+	}
+};
+
+class B2:public A{
+private:
+	int cvb2;
+public:
+	void outb2(){
+		cout<<"in b2";
+		outa();
+	}
+	B2(int a):A(a){
+		cout<<"initial B2"<<endl;
+	}
+};
+
+class C:public B1,public B2{
+public:
+	C(int a,int b1,int b2):B1(b1),B2(b2){
+		cout<<"initial C"<<endl;
+		outb1();
+		outb2();
+	}
+};
+
+void main(){
+	C myC=C(1,2,3);
+}
+
+
+使用虚基类的方式：
+1 需要在C的初始化列表中调用A的构造函数
+2 B1，B2在初始化过程中，会自动屏蔽掉自己构造函数中关于A的部分
+initial A
+initial B1
+initial B2
+initial C
+in b1A:1
+in b2A:1
+
+#include<iostream>
+using namespace std;
+
+class A{
+private:
+		int cv1;
+
+public:
+	void outa(){
+		cout<<"A:"<<cv1<<endl;
+	}
+	A(int a):cv1(a){
+	cout<<"initial A"<<endl;
+	}
+};
+
+class B1:virtual public A{
+private:
+	int cvb1;
+public:
+	void outb1(){
+		cout<<"in b1";
+		outa();
+	}
+	B1(int a):A(a){
+		cout<<"initial B1"<<endl;
+	}
+};
+
+class B2:virtual public A{
+private:
+	int cvb2;
+public:
+	void outb2(){
+		cout<<"in b2";
+		outa();
+	}
+	B2(int a):A(a){
+		cout<<"initial B2"<<endl;
+	}
+};
+
+class C:public B1,public B2{
+public:
+	C(int a,int b1,int b2):A(a),B1(b1),B2(b2){
+		cout<<"initial C"<<endl;
+		outb1();
+		outb2();
+	}
+};
+
+
+
+void main(){
+	C myC=C(1,2,3);
+}
+
+
+
+
+
+
+
